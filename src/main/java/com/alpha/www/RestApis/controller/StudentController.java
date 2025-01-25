@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,57 +21,63 @@ import com.alpha.www.RestApis.bean.Student;
 public class StudentController {
 
 	@GetMapping("/student")
-	public Student getStudent() {
-		return new Student(1, "tom", "sharma");
+	public ResponseEntity<Student> getStudent() {
+		Student student = new Student(1, "tom", "sharma");
+//		return ResponseEntity.ok(student);
+//		return new ResponseEntity<>(student, HttpStatus.OK);
+		return ResponseEntity
+				.ok()
+				.header("custom-header", "tom")
+				.body(student);
 	}
 	
 	@GetMapping("/students")
-	public List<Student> getStudents(){
+	public ResponseEntity<List<Student>> getStudents(){
 		List<Student> students = new ArrayList<>();
 		students.add(new Student(1, "tom", "sharma"));
 		students.add(new Student(2, "jerry", "agrawal"));
 		students.add(new Student(3, "john", "cena"));
 		students.add(new Student(4, "abc", "xyz"));
-		return students;
+		return ResponseEntity.ok(students);
 	}
 	
 	@GetMapping("/student/{id}/{first-name}/{last-name}")
-	public Student studentPathVariable(
+	public ResponseEntity<Student> studentPathVariable(
 			@PathVariable("id") int studentId, 
 			@PathVariable("first-name") String firstName, 
 			@PathVariable("last-name") String lastName) {
-		return new Student(studentId, firstName, lastName);
+		return ResponseEntity.ok(new Student(studentId, firstName, lastName));
 	}
 	
 	// localhost:8080/student/query?id=1&firstName=tom&lastName=sharma
 	@GetMapping("/student/query")
-	public Student studentQueryParameter(
+	public ResponseEntity<Student> studentQueryParameter(
 			@RequestParam int id, 
 			@RequestParam String firstName,
 			@RequestParam String lastName) {
-		return new Student(id, firstName, lastName);
+		return ResponseEntity.ok(new Student(id, firstName, lastName));
 	}
 	
 	@PostMapping("/student/create")
-	@ResponseStatus(HttpStatus.CREATED)
-	public Student createStudent(@RequestBody Student student) {
+//	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<Student> createStudent(@RequestBody Student student) {
 		System.out.println(student.getId());
 		System.out.println(student.getFirstName());
 		System.out.println(student.getLastName());
 		System.out.println(student);
-		return student;
+		return new ResponseEntity<Student>(student, HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/student/update/{id}")
-	public Student updateStudent(@RequestBody Student student, @PathVariable("id") int studentId) {
+	public ResponseEntity<Student> updateStudent(@RequestBody Student student, @PathVariable("id") int studentId) {
 		System.out.println(student.getFirstName());
 		System.out.println(student.getLastName());
-		return student;
+		return ResponseEntity.ok(student);
 	}
 	
 	@DeleteMapping("/student/delete/{id}")
-	public String deleteStudent(@PathVariable int id) {
+	public ResponseEntity<String> deleteStudent(@PathVariable int id) {
 		System.out.println(id);
-		return (id <= 10) ? "Student successfully deleted with id: " + id : "Student not found with id: " + id;
+		return ResponseEntity.ok((id <= 10) ? "Student successfully deleted with id: " + id : "Student not found with id: " + id);
 	}
 }
